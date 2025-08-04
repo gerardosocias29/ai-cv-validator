@@ -21,18 +21,27 @@ export const cvRouter = createTRPCRouter({
       try {
         const url = new URL(input.pdfUrl);
         const relativePath = url.pathname;
-        const isValid = await validateCV(relativePath, input);
+        const response = await validateCV(relativePath, input);
+        if (response?.valid) {
+          console.log("CV validation passed:", response);
+          submission = await db.cvSubmission.create({
+            data: {
+              ...input,
+              pdfUrl: relativePath,
+            },
+          });
 
-        if (!isValid) {
-          throw new Error("CV validation failed: Missing key information.");
+          return submission;
         }
 
-        submission = await db.cvSubmission.create({
-          data: input,
-        });
+        if(!response?.valid) {
+          console.error("CV validation failed:", response);
+          // throw new Error("CV validation failed");
+          return response.mismatches;
+        }
       } catch (err: any) {
-        // console.error("CV validation threw an error:", err);
-        throw new Error("CV validation failed: " + err?.message);
+        console.error("CV validation threw an error:", err);
+        // throw new Error("CV validation failed: " + err?.message);
       }
 
       return submission;

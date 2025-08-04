@@ -9,7 +9,7 @@ export async function validateCV(pdfUrl: string, input: {
   phone: string;
   skills: string;
   experience: string;
-}): Promise<boolean> {
+}): Promise<any> {
   let pdfBuffer: Buffer;
   let filePath: string;
 
@@ -58,8 +58,9 @@ export async function validateCV(pdfUrl: string, input: {
     const prompt = `
 You are an AI recruiter.
 
-Given the resume text and the submitted applicant details below, verify if all the following fields appear in the resume and reasonably match:
+Given the resume text and the submitted applicant details below, check if each of the following fields appears in the resume and reasonably matches the applicant’s input.
 
+Fields to check:
 - Full Name: "${input.fullName}"
 - Email: "${input.email}"
 - Phone: "${input.phone}"
@@ -67,11 +68,21 @@ Given the resume text and the submitted applicant details below, verify if all t
 - Experience: "${input.experience}"
 
 Resume Text:
-"""${text.slice(0, 3500)}"""
+"""${text.slice(0, 8000)}"""
 
 Instructions:
-- If all fields are present and reasonably matched, respond with only: VALID
-- If any field is missing or doesn't match, respond with only: INVALID
+- Carefully compare each field from the applicant input to what is found in the resume.
+- If the resume lacks a field, or the content is significantly different, mark it as false.
+- Output your result in *strict JSON format only*, no explanations or extra text.
+- Format example (this exact structure):
+{
+  "fullName": true,
+  "email": false,
+  "phone": true,
+  "skills": false,
+  "experience": true
+}
+ONLY return this JSON.
 `;
 
     const completion = await openai.chat.completions.create({
@@ -79,15 +90,21 @@ Instructions:
       messages: [{ role: "user", content: prompt }],
     });
 
-    console.log("AI response:", completion);
+    const content = completion.choices[0]?.message?.content?.trim();
+    console.log("AI response content:", content);
 
-    console.log("AI response text:", completion.choices[0]?.message?.content);
+    const matchResult = JSON.parse(content || "{}");
 
-    const result = completion.choices[0]?.message?.content?.trim().toUpperCase();
+    const mismatches = Object.entries(matchResult)
+      .filter(([_, matched]) => matched === false)
+      .map(([field]) => field);
 
-    return result === "VALID";
+    return {
+      valid: mismatches.length === 0,
+      mismatches: mismatches.length > 0 ? mismatches : undefined,
+    };
   } catch (err) {
     console.error("CV validation failed:", err);
-    throw new Error(`CV validation failed: ${err instanceof Error ? err.message : String(err)}`);
+    // throw new Error(`CV validation failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
