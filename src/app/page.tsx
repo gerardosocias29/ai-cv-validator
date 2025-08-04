@@ -29,7 +29,7 @@ export default function HomePage() {
     onError: (err: any) => alert("Error: " + err.message),
   });
 
-  const uploadPdf = async (file: File) => {
+  const uploadPdf = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
 
@@ -50,6 +50,16 @@ export default function HomePage() {
     if (!formData.file) return alert("No file selected");
 
     const pdfUrl = await uploadPdf(formData.file);
+    const origin = window.location.origin;
+    const uploadedUrl = origin + pdfUrl;
+    console.log("Mutating with:", {
+      fullName: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      skills: formData.skills,
+      experience: formData.experience,
+      uploadedUrl,
+    });
 
     submitCv.mutate({
       fullName: formData.name,
@@ -57,7 +67,7 @@ export default function HomePage() {
       phone: formData.phone,
       skills: formData.skills,
       experience: formData.experience,
-      pdfUrl,
+      pdfUrl: uploadedUrl,
     });
 
     setFormData({
