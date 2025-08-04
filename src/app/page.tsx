@@ -25,7 +25,13 @@ export default function HomePage() {
   };
 
   const submitCv = api.cv.submitCv.useMutation({
-    onSuccess: () => alert("CV submitted successfully!"),
+    onSuccess: (res) => {
+      if (res?.valid) {
+        alert("VALID CV! Submission successful.");
+      } else {
+        alert("INVALID CV! Mismatches found:\n" + res.map((m: any) => `- ${m}`).join("\n"));
+      }
+    },
     onError: (err: any) => alert("Error: " + err.message),
   });
 
