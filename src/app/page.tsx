@@ -25,7 +25,7 @@ export default function HomePage() {
   };
 
   const submitCv = api.cv.submitCv.useMutation({
-    onSuccess: (res) => {
+    onSuccess: (res: any) => {
       if (res?.valid) {
         alert("VALID CV! Submission successful.");
       } else {
