@@ -68,7 +68,6 @@ export default function HomePage() {
       experience: '',
       file: null,
     });
-    e.preventDefault();
 
     console.log("Form submitted with data:", {
       fullName: formData.name,
