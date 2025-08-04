@@ -37,7 +37,7 @@ export const cvRouter = createTRPCRouter({
         if(!response?.valid) {
           console.error("CV validation failed:", response);
           // throw new Error("CV validation failed");
-          return response.mismatches;
+          return response;
         }
       } catch (err: any) {
         console.error("CV validation threw an error:", err);
