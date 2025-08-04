@@ -70,23 +70,6 @@ export default function HomePage() {
       pdfUrl: uploadedUrl,
     });
 
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      skills: '',
-      experience: '',
-      file: null,
-    });
-
-    console.log("Form submitted with data:", {
-      fullName: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      skills: formData.skills,
-      experience: formData.experience,
-      pdfUrl,
-    });
   };
 
   return (

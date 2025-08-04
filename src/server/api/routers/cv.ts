@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
+import { validateCV } from "~/server/utils/validate-cv";
 
 export const cvRouter = createTRPCRouter({
   submitCv: publicProcedure
@@ -15,8 +16,25 @@ export const cvRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      return await db.cvSubmission.create({
-        data: input,
-      });
+      let submission;
+
+      try {
+        const url = new URL(input.pdfUrl);
+        const relativePath = url.pathname;
+        const isValid = await validateCV(relativePath, input);
+
+        if (!isValid) {
+          throw new Error("CV validation failed: Missing key information.");
+        }
+
+        submission = await db.cvSubmission.create({
+          data: input,
+        });
+      } catch (err: any) {
+        // console.error("CV validation threw an error:", err);
+        throw new Error("CV validation failed: " + err?.message);
+      }
+
+      return submission;
     }),
 });
