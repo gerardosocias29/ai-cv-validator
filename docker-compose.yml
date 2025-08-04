@@ -1,35 +1,26 @@
 version: '3.9'
 
 services:
-  db:
-    image: postgres:15
-    container_name: postgres
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: cvdb
-    volumes:
-      - db-data:/var/lib/postgresql/data
-
   app:
     container_name: next-app
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - db
+      args:
+        AUTH_SECRET: ${AUTH_SECRET}
+        AUTH_DISCORD_ID: ${AUTH_DISCORD_ID}
+        AUTH_DISCORD_SECRET: ${AUTH_DISCORD_SECRET}
+        NODE_ENV: production
+        DATABASE_URL: ${DATABASE_URL}
+        OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgres://postgres:postgres@db:5432/cvdb
+      DATABASE_URL: ${DATABASE_URL}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_DISCORD_ID: ${AUTH_DISCORD_ID}
+      AUTH_DISCORD_SECRET: ${AUTH_DISCORD_SECRET}
     volumes:
       - ./public/uploads:/app/public/uploads
-    command: "npm run start"
-
-volumes:
-  db-data:
