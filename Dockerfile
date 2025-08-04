@@ -21,6 +21,8 @@ USER appuser
 
 ENV NODE_ENV=production
 
+COPY prisma ./prisma
+
 COPY --from=builder --chown=appuser:appgroup /app/.next/standalone ./
 
 COPY --from=builder --chown=appuser:appgroup /app/public ./public
