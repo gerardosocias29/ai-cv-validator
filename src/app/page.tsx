@@ -29,7 +29,12 @@ export default function HomePage() {
       if (res?.valid) {
         alert("VALID CV! Submission successful.");
       } else {
-        alert("INVALID CV! Mismatches found:\n" + res.map((m: any) => `- ${m}`).join("\n"));
+        if (res?.mismatches.length > 0) {
+          alert(
+            "INVALID CV! Mismatches found:\n" +
+              res.mismatches.map((m: any) => `- ${m}`).join("\n"),
+          );
+        }
       }
     },
     onError: (err: any) => alert("Error: " + err.message),
