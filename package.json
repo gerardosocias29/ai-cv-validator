@@ -17,7 +17,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
-    "start": "next start",
+    "start": "mkdir -p public/uploads && next start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
