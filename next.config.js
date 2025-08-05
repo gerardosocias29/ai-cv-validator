@@ -17,7 +17,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  output: 'standalone',
+  output: 'export',
 };
 
 export default nextConfig;
