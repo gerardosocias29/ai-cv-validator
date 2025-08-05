@@ -13,6 +13,8 @@ RUN \
 
 COPY . .
 
+RUN npx prisma generate
+
 ARG AUTH_SECRET
 ARG DATABASE_URL
 ARG OPENROUTER_API_KEY
