@@ -11,9 +11,10 @@ RUN \
   else echo "No lockfile found" && exit 1; \
   fi
 
-COPY . .
+COPY prisma ./prisma
+RUN npm run generate
 
-RUN npx prisma generate
+COPY . .
 
 ARG AUTH_SECRET
 ARG DATABASE_URL
@@ -35,7 +36,6 @@ ENV PORT=3000
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-
 COPY --from=builder /app/package.json ./
 
 EXPOSE 3000
